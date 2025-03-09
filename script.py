@@ -1,12 +1,13 @@
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
-def load_dataset(filepath='top_100_films.csv'):
+def load_dataset(filepath='movies.csv'):
     """
     Load the top 100 films dataset from a CSV file.
     """
     try:
         df = pd.read_csv(filepath)
+        print("Columns in dataset:", df.columns.tolist())  # Debug line
         return df
     except Exception as e:
         print(f"Error loading dataset: {e}")
@@ -18,7 +19,7 @@ def display_films(df):
     """
     print("Top 100 Films:")
     for idx, row in df.iterrows():
-        print(f"{idx}: {row['Title']} (IMDb Rating: {row['IMDb_Rating']})")
+        print(f"{idx}: {row['Title']} (Rating: {row['Rating']})")
     print("\nPlease rate at least 5 films from the list (ratings should be between 0 and 5).")
 
 def get_user_ratings(df, min_ratings=5):
@@ -56,7 +57,7 @@ def train_rating_model(df, user_ratings):
     # Map the user ratings to a new column in the DataFrame
     rated_df['User_Rating'] = rated_df.index.map(user_ratings)
     
-    X_train = rated_df[['IMDb_Rating']]
+    X_train = rated_df[['Rating']]
     y_train = rated_df['User_Rating']
     
     model = LinearRegression()
@@ -68,8 +69,13 @@ def predict_unrated_films(df, user_ratings, model):
     Use the trained model to predict ratings for films not yet rated by the user.
     Returns a DataFrame of unrated films with predicted ratings.
     """
+    # Drop films that the user has rated
     unrated_df = df.drop(user_ratings.keys())
-    X_unrated = unrated_df[['IMDb_Rating']]
+    
+    # Drop any rows that have missing values in the 'Rating' column
+    unrated_df = unrated_df.dropna(subset=['Rating'])
+    
+    X_unrated = unrated_df[['Rating']]
     predictions = model.predict(X_unrated)
     
     # Create a copy and add the predictions column
