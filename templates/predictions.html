@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Predicted Ratings</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #006400; color: #fff; }
+    </style>
+</head>
+<body>
+    <h1>Predicted Ratings for Films You Haven't Rated</h1>
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Predicted Rating</th>
+        </tr>
+        {% for prediction in predictions %}
+        <tr>
+            <td>{{ prediction.Title }}</td>
+            <td>{{ prediction.Predicted_User_Rating | round(2) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="{{ url_for('index') }}">Rate Again</a>
+</body>
+</html>
